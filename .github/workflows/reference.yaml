@@ -1,0 +1,46 @@
+name: 'Reusable Code Quality Scan'
+
+on:
+  workflow_call:   # 👈 Makes this a reusable workflow
+    inputs:
+      projectKey:
+        required: true
+        type: string
+      projectName:
+        required: true
+        type: string
+      sources:
+        required: true
+        type: string
+    secrets:
+      SONAR_HOST_URL:
+        required: true
+      SONAR_TOKEN:
+        required: true
+
+jobs:
+  sonarQubeScan:
+    name: 'Run SonarQube Scan'
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: 'Checkout Code'
+        uses: 'actions/checkout@v4'
+        with:
+          fetch-depth: 0
+
+      - env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        name: 'Run SonarQube Scan'
+        run: |
+          echo "${{ inputs.projectKey }}"
+          echo "${{ inputs.projectName }}"
+          echo "${{ inputs.sources }}"
+
+      - env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        id: 'sonarqube-quality-gate-check'
+        name: 'SonarQube Quality Gate check'
+        run: echo "qg check"
